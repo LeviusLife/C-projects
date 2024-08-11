@@ -1,0 +1,61 @@
+To understand the worst-case time complexity of the contains function a few of its
+components need to be examined. Within my contains function the main components are:
+myhash(x), std::find, and the line "auto &whichList = theList[myhash(x)]." 
+
+For myhash(x), the time complexity would be most likely near O(1) but potentially it could be
+linear. Within myhash(x) are the lines:
+
+    std::hash<T> hf
+    return hf(x) % theList.size();
+
+Creating an object of hash<T> will only O(1), but the worst-case time complexity of hf(x) could be
+different. hf(x) is using a constructor of std::hash in order to make a hash value of x. And
+depending on the data type of x the time complexity could be constant or linear. Specifically, 
+if x is an integer or doubles then the time complexity of making a hash value from x will be constant.
+But if x's data type is a string or a derived data type then the time complexity can become linear.
+The standard library may not have an algorithm that can effectively hash a user defined type so the 
+worst case-time complexity could be linear. With all those factors taken into consideration, myhash could
+be O(n) at worst.
+
+
+For the std::find function, the worst-case time complexity would most likely be O(n). In my contains
+function the find function is used as follows:
+
+find( begin(whichList), end(whichList), x) != end(whichList);
+
+the find function is looping through the linkedlist whichList (which is just a reference to a specific list inside 
+the vector of lists "theList") until it finds x. If x is not found by find, then the find function
+will return an iterator that represents the position after the last element within whichList. Once the iterator
+is returned by find the rest of the statement will be evaluated:
+
+(iterator returned by find) != end(whichList)
+
+if the iterator returned by find is end(whichList) that means the expression will be 
+end(whichList) != end(whichList) which will evaluate to false. If the iterator returned by find is 
+another iterator that means the expression will evaluate to true and x is somewhere within whichList.
+With all this in mind, the worst-case time complexity of find would most likely be O(n) because x could potentially 
+be located all the way at the end of whichList. So, if the input size of whichList is large then the time it takes for 
+find will increase (the time it takes for std::find to locate x depends on the input size ).
+
+The line "auto &whichList = theList[myhash(x)]" will have a time complexity of O(n) or O(1) (but more than
+likely it will be O(1)). The worst-case time complexity of myhash(x) has already been explained  O(n)) so the
+rest of this line will be easy to explain. Assuming that hash(x) is O(1), then the rest of line should be O(1) as well.
+Accessing the specific list within the vector of lists "theList" with the snippet "theList[myhash(x)]" would be O(1). Or,
+in other words, this snippet would be considered O(1) because this snippet is just accessing an element within a the vector with an 
+index. Assigning theList[myhash(x)] a new alias (whichList) is also O(1).
+
+To summarize, the worst-case time complexity of contains could be O(n) due to the hash function interacting with 
+a large string or a complex user defined type. Or contains could possibly be O(n) if the linkedlist that is being 
+searched through is large and x is at the very end of said list. To be more general, if all of the elements hash to the
+same bucket/cell then traversing the linkedlist will be O(n).
+
+
+
+The average-case time complexity of contains can be a little bit more tricky to evaluate. The average-case
+time complexity will heavily depend on the load factor and how efficient the current hash function is. Typically, 
+items will be distributed neatly to the buckets of the hashtable so the worst-case scenario is unlikely to happen (at least
+in hash table with a decent load factor and hash function). The load factor of a hash table can be defined as n/m or the average
+number of elements per slot/bucket. If the load factor, or this ratio if you will, increases then the likely of a collision
+will increase which will cause the average case time complexity to get worse.When we're talking about separate chaining hash tables the 
+average-case time complexity would most likely be O(n/m). M would represent the number of slots or cells that are available to
+store items, while n would represent the average length of a linklist within the hashtable. 
